@@ -1,0 +1,275 @@
+import { NextAuthOptions, DefaultSession } from 'next-auth'
+import { JWT } from 'next-auth/jwt'
+import CredentialsProvider from 'next-auth/providers/credentials'
+import GoogleProvider from 'next-auth/providers/google'
+import { UserRole } from '@/types'
+
+// Extend the built-in session types
+declare module 'next-auth' {
+  interface Session extends DefaultSession {
+    user: {
+      id: string
+      email: string
+      name: string
+      role: UserRole
+      avatar?: string
+      isEmailVerified: boolean
+      isActive: boolean
+      phone?: string
+      dateOfBirth?: string
+      address?: string
+      city?: string
+      state?: string
+      pincode?: string
+      education?: string
+      targetExam?: string
+    } & DefaultSession['user']
+    accessToken: string
+  }
+
+  interface User {
+    id: string
+    email: string
+    name: string
+    role: UserRole
+    avatar?: string
+    isEmailVerified: boolean
+    isActive: boolean
+    phone?: string
+    dateOfBirth?: string
+    address?: string
+    city?: string
+    state?: string
+    pincode?: string
+    education?: string
+    targetExam?: string
+    accessToken: string
+  }
+}
+
+declare module 'next-auth/jwt' {
+  interface JWT {
+    id: string
+    role: UserRole
+    accessToken: string
+    refreshToken: string
+    accessTokenExpires: number
+  }
+}
+
+// Mock API functions - Replace with actual FastAPI calls
+async function authenticateUser(email: string, password: string) {
+  // Development mock authentication
+  // if (process.env.NODE_ENV === 'development') {
+  //   // Accept any email/password for development
+  //   if (email && password) {
+  //     return {
+  //       id: '1',
+  //       email: email,
+  //       name: email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+  //       role: 'student' as UserRole,
+  //       avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(email.split('@')[0])}&background=3B82F6&color=fff`,
+  //       isEmailVerified: true,
+  //       isActive: true, // always present
+  //       accessToken: 'dev-mock-token',
+  //     }
+  //   }
+  //   return null
+  // }
+
+  try {
+    const params = new URLSearchParams();
+    params.append('username', email);
+    params.append('password', password);
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: params.toString(),
+    })
+
+    if (!response.ok) {
+      return null
+    }
+
+    const data = await response.json()
+    // Map backend user fields to FE user object
+    return {
+      id: data.user.id,
+      email: data.user.email,
+      name: data.user.name,
+      role: data.user.role || 'student',
+      avatar: data.user.avatar,
+      isEmailVerified: Boolean(data.user.is_verified),
+      isActive: Boolean(data.user.is_active),
+      accessToken: data.access_token,
+    }
+  } catch (error) {
+    console.error('Authentication error:', error)
+    return null
+  }
+}
+
+async function refreshAccessToken(token: JWT): Promise<JWT> {
+  try {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/refresh`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        refreshToken: token.refreshToken,
+      }),
+    })
+
+    const refreshedTokens = await response.json()
+
+    if (!response.ok) {
+      throw refreshedTokens
+    }
+
+    return {
+      ...token,
+      accessToken: refreshedTokens.accessToken,
+      accessTokenExpires: Date.now() + refreshedTokens.expiresIn * 1000,
+      refreshToken: refreshedTokens.refreshToken ?? token.refreshToken,
+    }
+  } catch (error) {
+    console.error('Error refreshing access token:', error)
+    return {
+      ...token,
+      error: 'RefreshAccessTokenError',
+    }
+  }
+}
+
+export const authOptions: NextAuthOptions = {
+  providers: [
+    CredentialsProvider({
+      id: 'credentials',
+      name: 'credentials',
+      credentials: {
+        email: {
+          label: 'Email',
+          type: 'email',
+          placeholder: 'your@email.com',
+        },
+        password: {
+          label: 'Password',
+          type: 'password',
+        },
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          return null
+        }
+
+        const user = await authenticateUser(credentials.email, credentials.password)
+        
+        if (user) {
+          return user
+        }
+        
+        return null
+      },
+    }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          scope: 'openid email profile',
+        },
+      },
+    }),
+  ],
+  session: {
+    strategy: 'jwt',
+    maxAge: 24 * 60 * 60, // 24 hours
+    updateAge: 60 * 60, // 1 hour
+  },
+  jwt: {
+    maxAge: 24 * 60 * 60, // 24 hours
+  },
+  pages: {
+  signIn: '/auth/login',
+  error: '/auth/error',
+  verifyRequest: '/auth/verify-request',
+    newUser: '/onboarding',
+  },
+  callbacks: {
+    async jwt({ token, user, account }) {
+      // Initial sign in
+      if (account && user) {
+        return {
+          ...token,
+          id: user.id,
+          role: user.role,
+          isEmailVerified: user.isEmailVerified,
+          isActive: user.isActive,
+          accessToken: user.accessToken || 'dev-mock-token',
+          refreshToken: account.refresh_token || 'dev-mock-refresh',
+          accessTokenExpires: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
+        }
+      }
+
+      // Return previous token if the access token has not expired yet
+      if (Date.now() < token.accessTokenExpires) {
+        return token
+      }
+
+      // Access token has expired, try to update it
+      if (process.env.NODE_ENV === 'development') {
+        // For development, just extend the token
+        return {
+          ...token,
+          accessTokenExpires: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
+        }
+      }
+
+      return refreshAccessToken(token)
+    },
+    async session({ session, token }) {
+      if (token) {
+        session.user.id = token.id
+        session.user.role = token.role
+        session.user.isEmailVerified = Boolean(token.isEmailVerified)
+        session.user.isActive = Boolean(token.isActive)
+        session.accessToken = token.accessToken
+      }
+      return session
+    },
+    async redirect({ url, baseUrl }) {
+      // Allows relative callback URLs
+      if (url.startsWith('/')) return `${baseUrl}${url}`
+      // Allows callback URLs on the same origin
+      else if (new URL(url).origin === baseUrl) return url
+      return baseUrl
+    },
+  },
+  events: {
+    async signIn({ user, account, profile, isNewUser }) {
+      console.log('User signed in:', { user: user.email, isNewUser })
+      // Log sign-in event to your analytics/audit system
+    },
+    async signOut({ session, token }) {
+      console.log('User signed out:', { user: session?.user?.email })
+      // Invalidate token on backend
+      if (token?.accessToken) {
+        try {
+          await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/logout`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token.accessToken}`,
+              'Content-Type': 'application/json',
+            },
+          })
+        } catch (error) {
+          console.error('Error during logout:', error)
+        }
+      }
+    },
+  },
+  debug: process.env.NODE_ENV === 'development',
+}
