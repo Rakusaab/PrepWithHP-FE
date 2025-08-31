@@ -101,3 +101,20 @@ export interface LeaderboardEntry {
   // Extend as per backend analytics response
   message: string;
 }
+
+export interface WeakArea {
+  id: number;
+  subject: string;
+  topic: string;
+  score: number;
+  attempts: number;
+  improvement_suggestions: string[];
+}
+
+export interface QuestionStatistics {
+  question_id: number;
+  total_attempts: number;
+  correct_attempts: number;
+  success_rate: number;
+  average_time: number;
+}

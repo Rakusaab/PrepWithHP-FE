@@ -6,7 +6,7 @@ export async function login(email: string, password: string): Promise<Token> {
   const form = new URLSearchParams();
   form.append('username', email);
   form.append('password', password);
-  const { data } = await api.post<Token>('/api/v1/auth/login', form, {
+  const { data } = await api.post<Token>('/auth/login', form, {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
   });
   setAccessToken(data.access_token);
@@ -20,6 +20,6 @@ export async function logout() {
 }
 
 export async function register(user: Partial<User> & { password: string }): Promise<User> {
-  const { data } = await api.post<User>('/api/v1/auth/register', user);
+  const { data } = await api.post<User>('/auth/register', user);
   return data;
 }

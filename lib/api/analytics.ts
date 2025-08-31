@@ -1,27 +1,27 @@
 import api from './axios';
-import { AnalyticsUserPerformance, LeaderboardEntry } from './types';
+import { AnalyticsUserPerformance, LeaderboardEntry, WeakArea, SubjectProgress, QuestionStatistics } from './types';
 
-export async function getUserPerformance(user_id: number) {
-  const { data } = await api.get<AnalyticsUserPerformance>(`/api/v1/analytics/analytics/user-performance/${user_id}`);
+export async function getUserPerformance(user_id: number): Promise<AnalyticsUserPerformance> {
+  const { data } = await api.get<AnalyticsUserPerformance>(`/analytics/user-performance/${user_id}`);
   return data;
 }
 
-export async function getLeaderboard() {
-  const { data } = await api.get<LeaderboardEntry[]>('/api/v1/analytics/analytics/leaderboard');
+export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
+  const { data } = await api.get<LeaderboardEntry[]>('/analytics/leaderboard');
   return data;
 }
 
-export async function getWeakAreas() {
-  const { data } = await api.get('/api/v1/analytics/analytics/weak-areas-analysis');
+export async function getWeakAreasAnalysis(): Promise<WeakArea[]> {
+  const { data } = await api.get('/analytics/weak-areas-analysis');
   return data;
 }
 
-export async function getSubjectWisePerformance() {
-  const { data } = await api.get('/api/v1/analytics/analytics/subject-wise-performance');
+export async function getSubjectWisePerformance(): Promise<SubjectProgress[]> {
+  const { data } = await api.get('/analytics/subject-wise-performance');
   return data;
 }
 
-export async function getQuestionStatistics(question_id: number) {
-  const { data } = await api.get(`/api/v1/analytics/analytics/question-statistics/${question_id}`);
+export async function getQuestionStatistics(question_id: number): Promise<QuestionStatistics> {
+  const { data } = await api.get(`/analytics/question-statistics/${question_id}`);
   return data;
 }

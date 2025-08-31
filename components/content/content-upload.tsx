@@ -8,6 +8,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AIQuizTaker } from '@/components/quiz/ai-quiz-taker';
+import { AIQuizResults } from '@/components/dashboard/ai-quiz-results';
 import { QuizResult } from '@/lib/api/quiz';
 import api from '@/lib/api/axios';
 import { 
@@ -664,20 +665,13 @@ export function ContentUpload() {
 
         {/* Results Tab */}
         <TabsContent value="results" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Study Progress & Results</CardTitle>
-              <CardDescription>
-                Track your learning progress and quiz performance
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8">
-                <Target className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-500">Complete some quizzes to see your results here</p>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="space-y-6">
+            <div className="text-center space-y-2">
+              <h2 className="text-2xl font-bold text-gray-900">Study Progress & Results</h2>
+              <p className="text-gray-600">Track your learning progress and quiz performance</p>
+            </div>
+            <AIQuizResults />
+          </div>
         </TabsContent>
       </Tabs>
         </>

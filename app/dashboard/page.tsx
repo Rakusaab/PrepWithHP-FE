@@ -9,6 +9,7 @@ import { ExamCategoriesGrid } from '@/components/dashboard/exam-categories'
 import { PerformanceCharts } from '@/components/dashboard/performance-charts'
 import { StudyStreakCard, BadgeShowcase } from '@/components/dashboard/study-streak'
 import { WeakAreasAnalysis, PersonalizedRecommendations } from '@/components/dashboard/weak-areas'
+import { AIQuizResults } from '@/components/dashboard/ai-quiz-results'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge as BadgeUI } from '@/components/ui/badge'
@@ -356,7 +357,8 @@ export default function DashboardPage() {
             </TabsContent>
 
             {/* Performance Tab */}
-            <TabsContent value="performance">
+            <TabsContent value="performance" className="space-y-6">
+              <AIQuizResults />
               <PerformanceCharts 
                 testResults={recentTestResults}
                 subjectProgress={subjectProgress}
