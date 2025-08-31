@@ -23,6 +23,7 @@ import {
   Bell,
   ChevronLeft,
   ChevronRight,
+  Home,
   Brain
 } from 'lucide-react'
 
@@ -35,21 +36,29 @@ interface SidebarProps {
 
 const navigationItems = [
   {
+    name: 'Back to Home',
+    href: '/',
+    icon: Home,
+    description: 'Return to main site',
+    isExternal: true
+  },
+  {
+    name: 'AI Study Assistant',
+    href: '/study-assistant',
+    icon: Brain,
+    description: 'AI-powered learning',
+    featured: true
+  },
+  {
     name: 'Dashboard',
     href: '/dashboard',
     icon: LayoutDashboard,
     description: 'Overview and stats'
   },
   {
-    name: 'AI Study Assistant',
-    href: '/study-assistant',
-    icon: BookOpen,
-    description: 'Upload and analyze content'
-  },
-  {
     name: 'Take Test',
     href: '/test/setup',
-    icon: Target,
+    icon: BookOpen,
     description: 'Start a new test'
   },
   {
@@ -197,7 +206,11 @@ export function Sidebar({ collapsed, onCollapsedChange, mobileMenuOpen = false, 
                 href={item.href}
                 className={`
                   flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors
-                  ${isActive 
+                  ${item.isExternal
+                    ? 'text-primary-600 hover:bg-primary-50 border border-primary-200'
+                    : item.featured
+                    ? 'text-primary-600 hover:bg-primary-50 bg-primary-25'
+                    : isActive 
                     ? 'bg-primary-50 text-primary-700 border-r-2 border-primary-600' 
                     : 'text-gray-700 hover:bg-gray-50'
                   }
@@ -205,7 +218,13 @@ export function Sidebar({ collapsed, onCollapsedChange, mobileMenuOpen = false, 
                 title={collapsed ? item.name : undefined}
                 onClick={() => setMobileMenuOpen(false)}
               >
-                <item.icon className={`h-5 w-5 ${isActive ? 'text-primary-600' : 'text-gray-400'}`} />
+                <item.icon className={`h-5 w-5 ${
+                  item.isExternal || item.featured 
+                    ? 'text-primary-600' 
+                    : isActive 
+                    ? 'text-primary-600' 
+                    : 'text-gray-400'
+                }`} />
                 {!collapsed && (
                   <div className="ml-3">
                     <span>{item.name}</span>
