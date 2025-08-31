@@ -6,6 +6,7 @@ import { Stats } from '@/components/sections/stats'
 import { CTA } from '@/components/sections/cta'
 import { Header } from '@/components/layout/header'
 import { Footer } from '@/components/layout/footer'
+import { ContentUpload } from '@/components/content/content-upload'
 
 export default function HomePage() {
   return (
@@ -13,6 +14,7 @@ export default function HomePage() {
       <Header />
       <main>
         <Hero />
+        <ContentUpload />
         <Stats />
         <ExamCategories />
         <Features />

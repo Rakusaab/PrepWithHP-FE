@@ -22,7 +22,8 @@ import {
   Clock,
   Bell,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Brain
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -40,9 +41,15 @@ const navigationItems = [
     description: 'Overview and stats'
   },
   {
+    name: 'AI Study Assistant',
+    href: '/study-assistant',
+    icon: BookOpen,
+    description: 'Upload and analyze content'
+  },
+  {
     name: 'Take Test',
     href: '/test/setup',
-    icon: BookOpen,
+    icon: Target,
     description: 'Start a new test'
   },
   {

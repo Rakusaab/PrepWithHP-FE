@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1',
+  baseURL: `${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}/api/v1`,
   withCredentials: false,
 });
 
@@ -24,9 +24,18 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    // Optionally handle token refresh here
+    // Handle token expiration - redirect to login
     if (error.response && error.response.status === 401) {
-      // TODO: trigger refresh logic or logout
+      // Clear tokens
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        
+        // Redirect to login if not already there
+        if (window.location.pathname !== '/auth/login') {
+          window.location.href = '/auth/login';
+        }
+      }
     }
     return Promise.reject(error);
   }
