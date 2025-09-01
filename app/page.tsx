@@ -5,12 +5,13 @@ import { Features } from '@/components/sections/features'
 import { ExamCategories } from '@/components/sections/exam-categories'
 import { Testimonials } from '@/components/sections/testimonials'
 import { Stats } from '@/components/sections/stats'
+import { StrategicConversion } from '@/components/sections/strategic-conversion'
 import { CTA } from '@/components/sections/cta'
 import { Header } from '@/components/layout/header'
 import { Footer } from '@/components/layout/footer'
-import { ContentUpload } from '@/components/content/content-upload'
 import { FloatingActionButton } from '@/components/ui/floating-action-button'
 import { DemoVideo } from '@/components/demo/demo-video'
+import { FloatingAIDemoButton } from '@/components/demo/floating-ai-demo-button'
 
 export default function HomePage() {
   return (
@@ -20,15 +21,16 @@ export default function HomePage() {
         <Hero />
         <InteractiveFeatures />
         <AIFeatures />
-        <ContentUpload />
         <Stats />
         <ExamCategories />
         <Features />
         <Testimonials />
+        <StrategicConversion />
         <CTA />
       </main>
       <Footer />
       <FloatingActionButton />
+      <FloatingAIDemoButton />
       <DemoVideo />
     </div>
   )

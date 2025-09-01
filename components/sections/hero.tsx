@@ -2,11 +2,13 @@
 
 import React, { useState } from 'react'
 import Link from 'next/link'
+import { useSession } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
-import { BookOpen, Brain, Target, Trophy, ArrowRight, Play, Upload } from 'lucide-react'
+import { AIDemoPopup } from '@/components/demo/ai-demo-popup'
+import { BookOpen, Brain, Target, ArrowRight, Upload } from 'lucide-react'
 
 export function Hero() {
-  const [showDemo, setShowDemo] = useState(false)
+  const { data: session, status } = useSession()
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-primary-50 via-white to-secondary-50 py-16 sm:py-20">
@@ -43,28 +45,74 @@ export function Hero() {
           </p>
 
           {/* CTA Buttons */}
-          <div className="animate-fade-in-up opacity-0 animation-delay-800 flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-            <Button asChild size="lg" className="group text-lg px-8 py-4 bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl w-full sm:w-auto">
-              <Link href="/study-materials">
-                <BookOpen className="mr-2 h-5 w-5 group-hover:animate-pulse" />
-                Browse Study Materials
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </Button>
+          <div className="animate-fade-in-up opacity-0 animation-delay-800 flex flex-col gap-6 justify-center items-center mb-12">
             
-            <Button asChild variant="secondary" size="lg" className="group text-lg px-8 py-4 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl w-full sm:w-auto">
-              <Link href="/study-assistant">
-                <Upload className="mr-2 h-5 w-5 group-hover:animate-bounce" />
-                Upload & Analyze
-              </Link>
-            </Button>
-            
-            <Button asChild variant="outline" size="lg" className="group text-lg px-8 py-4 hover:bg-primary-50 hover:border-primary-300 transform hover:scale-105 transition-all duration-300 w-full sm:w-auto">
-              <Link href="/test/setup">
-                <Target className="mr-2 h-5 w-5 group-hover:animate-pulse" />
-                Practice Tests
-              </Link>
-            </Button>
+            {/* Primary CTA - Changes based on auth status */}
+            {status === 'authenticated' && session ? (
+              // Authenticated user - Show Upload & Analyze as primary
+              <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
+                <Button asChild size="lg" className="group text-lg px-8 py-4 bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl w-full sm:w-auto">
+                  <Link href="/study-assistant">
+                    <Upload className="mr-2 h-5 w-5 group-hover:animate-bounce" />
+                    Upload & Analyze
+                    <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                </Button>
+                
+                <Button asChild variant="secondary" size="lg" className="group text-lg px-8 py-4 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl w-full sm:w-auto">
+                  <Link href="/study-materials">
+                    <BookOpen className="mr-2 h-5 w-5 group-hover:animate-pulse" />
+                    Browse Study Materials
+                  </Link>
+                </Button>
+              </div>
+            ) : (
+              // Unauthenticated user - Show AI Demo as primary
+              <div className="space-y-4 w-full max-w-md mx-auto">
+                <AIDemoPopup>
+                  <Button size="lg" className="group text-xl px-10 py-6 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 text-white rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 w-full">
+                    <div className="flex items-center justify-center gap-3">
+                      <div className="p-2 bg-white/20 rounded-lg">
+                        <Brain className="h-6 w-6" />
+                      </div>
+                      <div>
+                        <div className="font-bold">Try AI Demo Free</div>
+                        <div className="text-sm opacity-90">Experience AI-powered learning</div>
+                      </div>
+                      <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </Button>
+                </AIDemoPopup>
+                
+                <div className="flex items-center justify-center gap-4 text-sm text-gray-500">
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span>No signup required</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                    <span>Takes 2 minutes</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Secondary CTAs */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Button asChild variant="outline" size="lg" className="group text-lg px-8 py-4 hover:bg-primary-50 hover:border-primary-300 transform hover:scale-105 transition-all duration-300 w-full sm:w-auto">
+                <Link href="/study-materials">
+                  <BookOpen className="mr-2 h-5 w-5 group-hover:animate-pulse" />
+                  Browse Study Materials
+                </Link>
+              </Button>
+              
+              <Button asChild variant="outline" size="lg" className="group text-lg px-8 py-4 hover:bg-primary-50 hover:border-primary-300 transform hover:scale-105 transition-all duration-300 w-full sm:w-auto">
+                <Link href="/test/setup">
+                  <Target className="mr-2 h-5 w-5 group-hover:animate-pulse" />
+                  Practice Tests
+                </Link>
+              </Button>
+            </div>
           </div>
 
           {/* Key Features */}
