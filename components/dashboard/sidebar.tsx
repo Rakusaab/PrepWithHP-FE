@@ -146,15 +146,6 @@ export function Sidebar({ collapsed, onCollapsedChange, mobileMenuOpen = false, 
   // Admin navigation items
   const adminNavigationItems = [
     {
-      name: 'Admin Dashboard',
-      href: '/admin',
-      icon: LayoutDashboard,
-      description: 'Admin overview',
-      isAdmin: true,
-      isExternal: false,
-      featured: false
-    },
-    {
       name: 'Content Generation',
       href: '/admin/content-generation',
       icon: Database,
@@ -173,7 +164,7 @@ export function Sidebar({ collapsed, onCollapsedChange, mobileMenuOpen = false, 
       featured: false
     },
     {
-      name: 'Study Materials',
+      name: 'Content Library',
       href: '/admin/materials',
       icon: FileText,
       description: 'Manage materials',
@@ -182,7 +173,7 @@ export function Sidebar({ collapsed, onCollapsedChange, mobileMenuOpen = false, 
       featured: false
     },
     {
-      name: 'Mock Tests',
+      name: 'Exam Management',
       href: '/admin/tests',
       icon: TestTube,
       description: 'Manage tests',
@@ -191,9 +182,9 @@ export function Sidebar({ collapsed, onCollapsedChange, mobileMenuOpen = false, 
       featured: false
     },
     {
-      name: 'Admin Analytics',
+      name: 'System Analytics',
       href: '/admin/analytics',
-      icon: BarChart3,
+      icon: Settings,
       description: 'System analytics',
       isAdmin: true,
       isExternal: false,
@@ -235,12 +226,12 @@ export function Sidebar({ collapsed, onCollapsedChange, mobileMenuOpen = false, 
       {/* Sidebar */}
       <div className={`
         fixed top-0 left-0 h-full bg-white border-r border-gray-200 z-50 lg:z-auto
-        transition-all duration-300 ease-in-out
+        transition-all duration-300 ease-in-out flex flex-col
         ${collapsed ? 'w-16' : 'w-64'}
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
           {!collapsed && (
             <div className="flex items-center space-x-2">
               <BookOpen className="h-6 w-6 text-primary-600" />
@@ -273,7 +264,7 @@ export function Sidebar({ collapsed, onCollapsedChange, mobileMenuOpen = false, 
 
         {/* User Info */}
         {session && (
-          <div className="p-4 border-b border-gray-200">
+          <div className="p-4 border-b border-gray-200 flex-shrink-0">
             <div className="flex items-center space-x-3">
               <Avatar className="h-10 w-10">
                 <AvatarFallback className="bg-primary-600 text-white">
@@ -295,7 +286,10 @@ export function Sidebar({ collapsed, onCollapsedChange, mobileMenuOpen = false, 
         )}
 
         {/* Navigation */}
-        <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
+        <nav className="flex-1 p-2 space-y-1 overflow-y-auto min-h-0 sidebar-scroll" style={{
+          scrollbarWidth: 'thin',
+          scrollbarColor: '#cbd5e1 #f1f5f9'
+        }}>
           {allNavigationItems.map((item, index) => {
             const isActive = pathname === item.href
             const showSeparator = isAdmin && index === adminNavigationItems.length && !collapsed
@@ -354,7 +348,7 @@ export function Sidebar({ collapsed, onCollapsedChange, mobileMenuOpen = false, 
         </nav>
 
         {/* Footer */}
-        <div className="border-t border-gray-200 p-2 space-y-1">
+        <div className="border-t border-gray-200 p-2 space-y-1 flex-shrink-0">
           <Link
             href="/profile"
             className="flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"

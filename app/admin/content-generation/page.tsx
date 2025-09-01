@@ -24,53 +24,26 @@ import {
   CheckCircle,
   Clock
 } from 'lucide-react'
-
-interface DatabaseStats {
-  exams: number
-  subjects: number
-  topics: number
-  study_materials: number
-  mock_test_series: number
-  mock_tests: number
-  recent_activity: {
-    type: string
-    title: string
-    created_at: string
-  }[]
-}
-
-interface GenerationConfig {
-  exam_type: 'hp_comprehensive' | 'single_exam' | 'custom'
-  specific_exams: string[]
-  generate_study_materials: boolean
-  generate_mock_tests: boolean
-  study_material_count: number
-  mock_test_count: number
-  difficulty_levels: string[]
-  languages: string[]
-  include_previous_papers: boolean
-  mock_test_duration: number
-  questions_per_test: number
-}
-
-interface CustomExam {
-  exam_name: string
-  exam_description: string
-  subjects: {
-    name: string
-    description: string
-    topics: string[]
-  }[]
-}
+import { 
+  getAdminStats, 
+  getAvailableExams, 
+  generateContent, 
+  createCustomExam, 
+  runScriptGeneration, 
+  clearAllContent,
+  type AdminStats,
+  type ContentGenerationRequest,
+  type CustomExamRequest 
+} from '@/lib/api/admin'
 
 export default function AdminContentGeneration() {
-  const [stats, setStats] = useState<DatabaseStats | null>(null)
+  const [stats, setStats] = useState<AdminStats | null>(null)
   const [availableExams, setAvailableExams] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [generationStatus, setGenerationStatus] = useState<string>('')
   const [generationProgress, setGenerationProgress] = useState(0)
 
-  const [config, setConfig] = useState<GenerationConfig>({
+  const [config, setConfig] = useState<ContentGenerationRequest>({
     exam_type: 'hp_comprehensive',
     specific_exams: [],
     generate_study_materials: true,
@@ -79,12 +52,12 @@ export default function AdminContentGeneration() {
     mock_test_count: 5,
     difficulty_levels: ['easy', 'medium', 'hard'],
     languages: ['english'],
-    include_previous_papers: true,
+    include_previous_papers: false,
     mock_test_duration: 120,
-    questions_per_test: 100
+    questions_per_test: 50
   })
 
-  const [customExam, setCustomExam] = useState<CustomExam>({
+  const [customExam, setCustomExam] = useState<CustomExamRequest>({
     exam_name: '',
     exam_description: '',
     subjects: []
@@ -103,15 +76,8 @@ export default function AdminContentGeneration() {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch('/api/v1/admin/stats', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      })
-      if (response.ok) {
-        const data = await response.json()
-        setStats(data)
-      }
+      const data = await getAdminStats()
+      setStats(data)
     } catch (error) {
       console.error('Failed to fetch stats:', error)
     }
@@ -119,15 +85,8 @@ export default function AdminContentGeneration() {
 
   const fetchAvailableExams = async () => {
     try {
-      const response = await fetch('/api/v1/admin/available-exams', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      })
-      if (response.ok) {
-        const data = await response.json()
-        setAvailableExams(data.available_exams)
-      }
+      const data = await getAvailableExams()
+      setAvailableExams(data)
     } catch (error) {
       console.error('Failed to fetch available exams:', error)
     }
@@ -139,40 +98,27 @@ export default function AdminContentGeneration() {
     setGenerationProgress(10)
 
     try {
-      const response = await fetch('/api/v1/admin/generate-content', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify(config)
-      })
-
-      if (response.ok) {
-        const result = await response.json()
-        setGenerationStatus(result.message)
-        setGenerationProgress(50)
-        
-        // Simulate progress updates
-        const progressInterval = setInterval(() => {
-          setGenerationProgress(prev => {
-            if (prev >= 95) {
-              clearInterval(progressInterval)
-              setGenerationStatus('Content generation completed!')
-              setTimeout(() => {
-                fetchStats() // Refresh stats
-                setLoading(false)
-                setGenerationProgress(0)
-                setGenerationStatus('')
-              }, 2000)
-              return 100
-            }
-            return prev + 5
-          })
-        }, 1000)
-      } else {
-        throw new Error('Generation failed')
-      }
+      const result = await generateContent(config)
+      setGenerationStatus(result.message)
+      setGenerationProgress(50)
+      
+      // Simulate progress updates
+      const progressInterval = setInterval(() => {
+        setGenerationProgress(prev => {
+          if (prev >= 95) {
+            clearInterval(progressInterval)
+            setGenerationStatus('Content generation completed!')
+            setTimeout(() => {
+              fetchStats() // Refresh stats
+              setLoading(false)
+              setGenerationProgress(0)
+              setGenerationStatus('')
+            }, 2000)
+            return 100
+          }
+          return prev + 5
+        })
+      }, 1000)
     } catch (error) {
       setGenerationStatus('Content generation failed')
       setLoading(false)
@@ -188,20 +134,10 @@ export default function AdminContentGeneration() {
 
     setLoading(true)
     try {
-      const response = await fetch('/api/v1/admin/create-custom-exam', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify(customExam)
-      })
-
-      if (response.ok) {
-        setGenerationStatus('Custom exam created successfully!')
-        fetchStats()
-        setCustomExam({ exam_name: '', exam_description: '', subjects: [] })
-      }
+      const result = await createCustomExam(customExam)
+      setGenerationStatus('Custom exam created successfully!')
+      fetchStats()
+      setCustomExam({ exam_name: '', exam_description: '', subjects: [] })
     } catch (error) {
       console.error('Custom exam creation error:', error)
     } finally {
@@ -215,38 +151,27 @@ export default function AdminContentGeneration() {
     setGenerationProgress(10)
 
     try {
-      const response = await fetch('/api/v1/admin/run-script-generation', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      })
-
-      if (response.ok) {
-        const result = await response.json()
-        setGenerationStatus(result.message)
-        setGenerationProgress(50)
-        
-        // Simulate progress updates
-        const progressInterval = setInterval(() => {
-          setGenerationProgress(prev => {
-            if (prev >= 95) {
-              clearInterval(progressInterval)
-              setGenerationStatus('Original script execution completed!')
-              setTimeout(() => {
-                fetchStats() // Refresh stats
-                setLoading(false)
-                setGenerationProgress(0)
-                setGenerationStatus('')
-              }, 2000)
-              return 100
-            }
-            return prev + 5
-          })
-        }, 1000)
-      } else {
-        throw new Error('Script execution failed')
-      }
+      const result = await runScriptGeneration()
+      setGenerationStatus(result.message)
+      setGenerationProgress(50)
+      
+      // Simulate progress updates
+      const progressInterval = setInterval(() => {
+        setGenerationProgress(prev => {
+          if (prev >= 95) {
+            clearInterval(progressInterval)
+            setGenerationStatus('Original script execution completed!')
+            setTimeout(() => {
+              fetchStats() // Refresh stats
+              setLoading(false)
+              setGenerationProgress(0)
+              setGenerationStatus('')
+            }, 2000)
+            return 100
+          }
+          return prev + 5
+        })
+      }, 1000)
     } catch (error) {
       setGenerationStatus('Script execution failed')
       setLoading(false)
@@ -261,17 +186,9 @@ export default function AdminContentGeneration() {
 
     setLoading(true)
     try {
-      const response = await fetch('/api/v1/admin/clear-all-content?confirm=true', {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      })
-
-      if (response.ok) {
-        setGenerationStatus('All content cleared successfully!')
-        fetchStats()
-      }
+      await clearAllContent(true)
+      setGenerationStatus('All content cleared successfully!')
+      fetchStats()
     } catch (error) {
       console.error('Clear content error:', error)
     } finally {

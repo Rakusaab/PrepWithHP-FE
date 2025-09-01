@@ -15,22 +15,7 @@ import {
   CheckCircle
 } from 'lucide-react'
 import Link from 'next/link'
-
-interface AdminStats {
-  exams: number
-  subjects: number
-  topics: number
-  study_materials: number
-  mock_test_series: number
-  mock_tests: number
-  total_users?: number
-  active_users?: number
-  recent_activity: {
-    type: string
-    title: string
-    created_at: string
-  }[]
-}
+import { getAdminStats, type AdminStats } from '@/lib/api/admin'
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState<AdminStats | null>(null)
@@ -42,15 +27,8 @@ export default function AdminDashboard() {
 
   const fetchAdminStats = async () => {
     try {
-      const response = await fetch('/api/v1/admin/stats', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      })
-      if (response.ok) {
-        const data = await response.json()
-        setStats(data)
-      }
+      const data = await getAdminStats()
+      setStats(data)
     } catch (error) {
       console.error('Failed to fetch admin stats:', error)
     } finally {

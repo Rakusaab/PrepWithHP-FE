@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useCallback, useRef } from 'react';
+import { useSession } from 'next-auth/react';
 import { useDropzone } from 'react-dropzone';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -25,10 +26,13 @@ import {
   XCircle,
   FileCheck,
   Clock,
-  Target
+  Target,
+  Lock,
+  UserPlus
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
+import Link from 'next/link';
 
 interface UploadedFile {
   id: number;
@@ -118,6 +122,7 @@ const getStatusIcon = (status: string) => {
 };
 
 export function ContentUpload() {
+  const { data: session, status } = useSession();
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -181,6 +186,9 @@ export function ContentUpload() {
   });
 
   const loadUserFiles = async () => {
+    // Only load files if user is authenticated
+    if (!session) return;
+    
     try {
       const response = await api.get('/content/uploads');
       
@@ -232,9 +240,11 @@ export function ContentUpload() {
     }
   };
 
-  // Load files on component mount
+  // Load files on component mount, but only if authenticated
   React.useEffect(() => {
-    loadUserFiles();
+    if (status === 'authenticated' && session) {
+      loadUserFiles();
+    }
     
     // Cleanup polling on unmount
     return () => {
@@ -244,7 +254,7 @@ export function ContentUpload() {
         setIsPolling(false);
       }
     };
-  }, []);
+  }, [session, status]);
 
   // Monitor selected file status to stop polling if no longer needed
   React.useEffect(() => {
@@ -329,7 +339,53 @@ export function ContentUpload() {
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-6">
-      {showQuizTaker && activeQuizId ? (
+      {/* Show login prompt for unauthenticated users */}
+      {status === 'unauthenticated' && (
+        <Card className="border-primary-200 bg-primary-50">
+          <CardContent className="flex flex-col items-center justify-center py-12 space-y-4">
+            <div className="rounded-full bg-primary-100 p-4">
+              <Lock className="h-8 w-8 text-primary-600" />
+            </div>
+            <div className="text-center space-y-2">
+              <h3 className="text-xl font-semibold text-primary-900">
+                Sign In to Access AI Study Assistant
+              </h3>
+              <p className="text-primary-700 max-w-md">
+                Upload your study materials and let AI generate personalized summaries and quizzes. 
+                Create an account to get started!
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <Button asChild>
+                <Link href="/auth/login">
+                  Sign In
+                </Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link href="/auth/register">
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Create Account
+                </Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Show loading state */}
+      {status === 'loading' && (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12 space-y-4">
+            <Loader2 className="h-8 w-8 text-primary-500 animate-spin" />
+            <p className="text-gray-600">Loading...</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Show main content for authenticated users */}
+      {status === 'authenticated' && session && (
+        <>
+          {showQuizTaker && activeQuizId ? (
         <div className="space-y-6">
           {/* Quiz Taker Header */}
           <div className="text-center space-y-4">
@@ -674,7 +730,9 @@ export function ContentUpload() {
           </div>
         </TabsContent>
       </Tabs>
-        </>
+          </>
+        )}
+      </>
       )}
     </div>
   );

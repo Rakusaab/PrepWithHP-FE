@@ -24,15 +24,19 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    // Handle token expiration - redirect to login
+    // Handle token expiration - redirect to login only if on protected pages
     if (error.response && error.response.status === 401) {
       // Clear tokens
       if (typeof window !== 'undefined') {
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
         
-        // Redirect to login if not already there
-        if (window.location.pathname !== '/auth/login') {
+        // Only redirect to login if we're on a protected page (not homepage or public pages)
+        const currentPath = window.location.pathname;
+        const publicPaths = ['/', '/auth/login', '/auth/register', '/auth/forgot-password'];
+        const isPublicPage = publicPaths.includes(currentPath) || currentPath.startsWith('/auth/');
+        
+        if (!isPublicPage && currentPath !== '/auth/login') {
           window.location.href = '/auth/login';
         }
       }

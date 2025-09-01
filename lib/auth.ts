@@ -186,11 +186,11 @@ export const authOptions: NextAuthOptions = {
   ],
   session: {
     strategy: 'jwt',
-    maxAge: 24 * 60 * 60, // 24 hours
-    updateAge: 60 * 60, // 1 hour
+    maxAge: 60 * 60, // 1 hour (matches backend)
+    updateAge: 15 * 60, // 15 minutes
   },
   jwt: {
-    maxAge: 24 * 60 * 60, // 24 hours
+    maxAge: 60 * 60, // 1 hour (matches backend)
   },
   pages: {
   signIn: '/auth/login',
@@ -210,7 +210,7 @@ export const authOptions: NextAuthOptions = {
           isActive: user.isActive,
           accessToken: user.accessToken || 'dev-mock-token',
           refreshToken: account.refresh_token || 'dev-mock-refresh',
-          accessTokenExpires: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
+          accessTokenExpires: Date.now() + 60 * 60 * 1000, // 1 hour (matches backend)
         }
       }
 
@@ -224,7 +224,7 @@ export const authOptions: NextAuthOptions = {
         // For development, just extend the token
         return {
           ...token,
-          accessTokenExpires: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
+          accessTokenExpires: Date.now() + 60 * 60 * 1000, // 1 hour (matches backend)
         }
       }
 
