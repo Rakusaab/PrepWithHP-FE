@@ -51,6 +51,8 @@ export default function DashboardPage() {
       // DEBUG: Log session object to diagnose activation enforcement
       // eslint-disable-next-line no-console
       console.log('Dashboard session:', session);
+      console.log('User role:', session?.user?.role);
+      console.log('User object:', session?.user);
       // Sync accessToken to localStorage for Axios
       if (session?.accessToken) {
         localStorage.setItem('access_token', session.accessToken);

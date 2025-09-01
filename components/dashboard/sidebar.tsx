@@ -24,7 +24,11 @@ import {
   ChevronLeft,
   ChevronRight,
   Home,
-  Brain
+  Brain,
+  Database,
+  Users,
+  FileText,
+  TestTube
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -40,62 +44,90 @@ const navigationItems = [
     href: '/',
     icon: Home,
     description: 'Return to main site',
-    isExternal: true
+    isExternal: true,
+    isAdmin: false,
+    featured: false
   },
   {
     name: 'AI Study Assistant',
     href: '/study-assistant',
     icon: Brain,
     description: 'AI-powered learning',
-    featured: true
+    featured: true,
+    isExternal: false,
+    isAdmin: false
   },
   {
     name: 'Dashboard',
     href: '/dashboard',
     icon: LayoutDashboard,
-    description: 'Overview and stats'
+    description: 'Overview and stats',
+    isExternal: false,
+    isAdmin: false,
+    featured: false
   },
   {
     name: 'Take Test',
     href: '/test/setup',
     icon: BookOpen,
-    description: 'Start a new test'
+    description: 'Start a new test',
+    isExternal: false,
+    isAdmin: false,
+    featured: false
   },
   {
     name: 'Practice',
     href: '/practice',
     icon: Target,
-    description: 'Practice by topics'
+    description: 'Practice by topics',
+    isExternal: false,
+    isAdmin: false,
+    featured: false
   },
   {
     name: 'Study Materials',
     href: '/study-materials',
     icon: BookOpen,
-    description: 'Learning resources'
+    description: 'Learning resources',
+    isExternal: false,
+    isAdmin: false,
+    featured: false
   },
   {
     name: 'Analytics',
     href: '/analytics',
     icon: BarChart3,
-    description: 'Detailed analytics'
+    description: 'Detailed analytics',
+    isExternal: false,
+    isAdmin: false,
+    featured: false
   },
   {
     name: 'Performance',
     href: '/performance',
     icon: TrendingUp,
-    description: 'Track progress'
+    description: 'Track progress',
+    isExternal: false,
+    isAdmin: false,
+    featured: false
   },
   {
     name: 'Schedule',
     href: '/dashboard/schedule',
     icon: Calendar,
-    description: 'Upcoming tests'
+    description: 'Upcoming tests',
+    isExternal: false,
+    isAdmin: false,
+    featured: false
   },
   {
     name: 'Achievements',
     href: '/dashboard/achievements',
     icon: Award,
-    description: 'Badges and rewards'
+    description: 'Badges and rewards',
+    isExternal: false,
+    isAdmin: false,
+    featured: false
   }
 ]
 
@@ -107,6 +139,72 @@ export function Sidebar({ collapsed, onCollapsedChange, mobileMenuOpen = false, 
   const [internalMobileMenuOpen, setInternalMobileMenuOpen] = useState(false)
   const isMobileMenuOpen = onMobileMenuChange ? mobileMenuOpen : internalMobileMenuOpen
   const setMobileMenuOpen = onMobileMenuChange || setInternalMobileMenuOpen
+
+  // Check if user is admin or super_admin
+  const isAdmin = session?.user?.role === 'admin' || session?.user?.role === 'super_admin'
+
+  // Admin navigation items
+  const adminNavigationItems = [
+    {
+      name: 'Admin Dashboard',
+      href: '/admin',
+      icon: LayoutDashboard,
+      description: 'Admin overview',
+      isAdmin: true,
+      isExternal: false,
+      featured: false
+    },
+    {
+      name: 'Content Generation',
+      href: '/admin/content-generation',
+      icon: Database,
+      description: 'Generate study content',
+      isAdmin: true,
+      featured: true,
+      isExternal: false
+    },
+    {
+      name: 'User Management',
+      href: '/admin/users',
+      icon: Users,
+      description: 'Manage users',
+      isAdmin: true,
+      isExternal: false,
+      featured: false
+    },
+    {
+      name: 'Study Materials',
+      href: '/admin/materials',
+      icon: FileText,
+      description: 'Manage materials',
+      isAdmin: true,
+      isExternal: false,
+      featured: false
+    },
+    {
+      name: 'Mock Tests',
+      href: '/admin/tests',
+      icon: TestTube,
+      description: 'Manage tests',
+      isAdmin: true,
+      isExternal: false,
+      featured: false
+    },
+    {
+      name: 'Admin Analytics',
+      href: '/admin/analytics',
+      icon: BarChart3,
+      description: 'System analytics',
+      isAdmin: true,
+      isExternal: false,
+      featured: false
+    }
+  ]
+
+  // Combine navigation items - show admin items first if user is admin
+  const allNavigationItems = isAdmin 
+    ? [...adminNavigationItems, ...navigationItems]
+    : navigationItems
 
   const handleSignOut = async () => {
     await signOut({ callbackUrl: '/' })
@@ -197,41 +295,60 @@ export function Sidebar({ collapsed, onCollapsedChange, mobileMenuOpen = false, 
         )}
 
         {/* Navigation */}
-        <nav className="flex-1 p-2 space-y-1">
-          {navigationItems.map((item) => {
+        <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
+          {allNavigationItems.map((item, index) => {
             const isActive = pathname === item.href
+            const showSeparator = isAdmin && index === adminNavigationItems.length && !collapsed
+            
             return (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={`
-                  flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors
-                  ${item.isExternal
-                    ? 'text-primary-600 hover:bg-primary-50 border border-primary-200'
-                    : item.featured
-                    ? 'text-primary-600 hover:bg-primary-50 bg-primary-25'
-                    : isActive 
-                    ? 'bg-primary-50 text-primary-700 border-r-2 border-primary-600' 
-                    : 'text-gray-700 hover:bg-gray-50'
-                  }
-                `}
-                title={collapsed ? item.name : undefined}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <item.icon className={`h-5 w-5 ${
-                  item.isExternal || item.featured 
-                    ? 'text-primary-600' 
-                    : isActive 
-                    ? 'text-primary-600' 
-                    : 'text-gray-400'
-                }`} />
-                {!collapsed && (
-                  <div className="ml-3">
-                    <span>{item.name}</span>
-                    <p className="text-xs text-gray-500 mt-0.5">{item.description}</p>
+              <React.Fragment key={item.name}>
+                {showSeparator && (
+                  <div className="py-2">
+                    <div className="border-t border-gray-200"></div>
+                    <p className="text-xs text-gray-500 mt-2 px-3 font-medium">STUDENT SECTION</p>
                   </div>
                 )}
-              </Link>
+                <Link
+                  href={item.href}
+                  className={`
+                    flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors
+                    ${item.isExternal
+                      ? 'text-primary-600 hover:bg-primary-50 border border-primary-200'
+                      : item.featured
+                      ? item.isAdmin 
+                        ? 'text-red-600 hover:bg-red-50 bg-red-25 border border-red-200' 
+                        : 'text-primary-600 hover:bg-primary-50 bg-primary-25'
+                      : item.isAdmin
+                      ? isActive
+                        ? 'bg-red-50 text-red-700 border-r-2 border-red-600'
+                        : 'text-gray-700 hover:bg-red-50'
+                      : isActive 
+                      ? 'bg-primary-50 text-primary-700 border-r-2 border-primary-600' 
+                      : 'text-gray-700 hover:bg-gray-50'
+                    }
+                  `}
+                  title={collapsed ? item.name : undefined}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <item.icon className={`h-5 w-5 ${
+                    item.isExternal || (item.featured && !item.isAdmin)
+                      ? 'text-primary-600' 
+                      : item.isAdmin
+                      ? item.featured || isActive
+                        ? 'text-red-600'
+                        : 'text-gray-400'
+                      : isActive 
+                      ? 'text-primary-600' 
+                      : 'text-gray-400'
+                  }`} />
+                  {!collapsed && (
+                    <div className="ml-3">
+                      <span>{item.name}</span>
+                      <p className="text-xs text-gray-500 mt-0.5">{item.description}</p>
+                    </div>
+                  )}
+                </Link>
+              </React.Fragment>
             )
           })}
         </nav>

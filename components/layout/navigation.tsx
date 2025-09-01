@@ -44,6 +44,11 @@ export default function Navigation() {
     { name: 'Profile', href: '/profile', icon: User },
     { name: 'Analytics', href: '/analytics', icon: BarChart3 },
     { name: 'Settings', href: '/settings', icon: Settings },
+    ...(session?.user?.email?.includes('admin') || 
+        session?.user?.email?.includes('rakesh') || 
+        session?.user?.role === 'admin' ? [
+      { name: 'Admin Panel', href: '/admin', icon: Settings }
+    ] : [])
   ] : [
     { name: 'Home', href: '/', icon: Home },
     { name: 'About', href: '/about', icon: BookOpen },

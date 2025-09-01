@@ -22,6 +22,6 @@ export async function completeSession(payload: { session_id: number; score: numb
 }
 
 export async function getTestResults(session_id: number) {
-  const { data } = await api.get<TestSession>(`/tests/results/${session_id}`);
+  const { data } = await api.get<TestSession>(`/results/${session_id}`);
   return data;
 }

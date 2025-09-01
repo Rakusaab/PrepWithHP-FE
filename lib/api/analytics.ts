@@ -11,6 +11,11 @@ export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
   return data;
 }
 
+export async function getWeakAreas(): Promise<WeakArea[]> {
+  const { data } = await api.get('/analytics/weak-areas-analysis');
+  return data;
+}
+
 export async function getWeakAreasAnalysis(): Promise<WeakArea[]> {
   const { data } = await api.get('/analytics/weak-areas-analysis');
   return data;
