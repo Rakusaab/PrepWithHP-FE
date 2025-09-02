@@ -28,7 +28,8 @@ import {
   Database,
   Users,
   FileText,
-  TestTube
+  TestTube,
+  Globe
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -150,6 +151,15 @@ export function Sidebar({ collapsed, onCollapsedChange, mobileMenuOpen = false, 
       href: '/admin/content-generation',
       icon: Database,
       description: 'Generate study content',
+      isAdmin: true,
+      featured: true,
+      isExternal: false
+    },
+    {
+      name: 'Content Scraping',
+      href: '/admin/content-scraping',
+      icon: Globe,
+      description: 'Web scraping system',
       isAdmin: true,
       featured: true,
       isExternal: false
