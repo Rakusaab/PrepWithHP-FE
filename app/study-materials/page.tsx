@@ -316,7 +316,7 @@ export default function StudyMaterialsPage() {
                         {material.rating_average && (
                           <span className="flex items-center">
                             <Star className="h-3 w-3 mr-1" />
-                            {material.rating_average.toFixed(1)}
+                            {Number(material.rating_average).toFixed(1)}
                           </span>
                         )}
                       </div>

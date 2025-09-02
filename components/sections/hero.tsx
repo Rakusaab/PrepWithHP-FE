@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
 import { AIDemoPopup } from '@/components/demo/ai-demo-popup'
+import { Logo } from '@/components/ui/logo'
 import { BookOpen, Brain, Target, ArrowRight, Upload } from 'lucide-react'
 
 export function Hero() {
@@ -26,7 +27,7 @@ export function Hero() {
           {/* Elegant Badge */}
           <div className="animate-fade-in-up opacity-0 animation-delay-200">
             <div className="inline-flex items-center gap-2 bg-gradient-to-r from-primary-100 to-secondary-100 text-primary-700 px-6 py-3 rounded-full text-sm font-medium mb-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border border-primary-200">
-              <Brain className="h-4 w-4 text-primary-600 animate-pulse" />
+              <Brain className="h-4 w-4 text-primary-600 animate-pulse hover:animate-bounce transition-all duration-300 hover:text-primary-700 hover:scale-110" />
               <span className="font-semibold">Himachal Pradesh Exam Preparation Platform</span>
             </div>
           </div>
@@ -81,16 +82,16 @@ export function Hero() {
                 {/* Primary AI Demo Button */}
                 <div className="flex justify-center">
                   <AIDemoPopup>
-                    <Button size="lg" className="group text-xl px-10 py-6 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 text-white rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+                    <Button size="lg" className="group text-base px-10 py-6 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 text-white rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
                       <div className="flex items-center justify-center gap-3">
                         <div className="p-2 bg-white/20 rounded-lg">
-                          <Brain className="h-6 w-6" />
+                          <Brain className="h-5 w-5" />
                         </div>
                         <div>
-                          <div className="font-bold">Try AI Demo Free</div>
-                          <div className="text-sm opacity-90">Experience AI-powered learning</div>
+                          <div className="font-bold text-sm">Try AI Demo Free</div>
+                          <div className="text-xs opacity-90">Experience AI-powered learning</div>
                         </div>
-                        <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                        <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                       </div>
                     </Button>
                   </AIDemoPopup>

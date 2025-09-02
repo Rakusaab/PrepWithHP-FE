@@ -144,14 +144,75 @@ module.exports = {
   		fontFamily: {
   			sans: [
   				'Inter',
+  				'-apple-system',
+  				'BlinkMacSystemFont',
+  				'Segoe UI',
+  				'Roboto',
+  				'Oxygen',
+  				'Ubuntu',
+  				'Cantarell',
+  				'Open Sans',
+  				'Helvetica Neue',
   				'system-ui',
   				'sans-serif'
   			],
   			heading: [
   				'Poppins',
+  				'Inter',
+  				'-apple-system',
+  				'BlinkMacSystemFont',
+  				'Segoe UI',
+  				'Roboto',
   				'system-ui',
   				'sans-serif'
+  			],
+  			display: [
+  				'Poppins',
+  				'Inter',
+  				'system-ui',
+  				'sans-serif'
+  			],
+  			body: [
+  				'Inter',
+  				'-apple-system',
+  				'BlinkMacSystemFont',
+  				'Segoe UI',
+  				'Roboto',
+  				'system-ui',
+  				'sans-serif'
+  			],
+  			mono: [
+  				'JetBrains Mono',
+  				'Fira Code',
+  				'Monaco',
+  				'Consolas',
+  				'Liberation Mono',
+  				'Courier New',
+  				'monospace'
   			]
+  		},
+  		fontSize: {
+  			'xs': ['0.75rem', { lineHeight: '1.5' }],
+  			'sm': ['0.875rem', { lineHeight: '1.5' }],
+  			'base': ['1rem', { lineHeight: '1.6' }],
+  			'lg': ['1.125rem', { lineHeight: '1.6' }],
+  			'xl': ['1.25rem', { lineHeight: '1.6' }],
+  			'2xl': ['1.5rem', { lineHeight: '1.5' }],
+  			'3xl': ['1.875rem', { lineHeight: '1.4' }],
+  			'4xl': ['2.25rem', { lineHeight: '1.3' }],
+  			'5xl': ['3rem', { lineHeight: '1.2' }],
+  			'6xl': ['3.75rem', { lineHeight: '1.1' }],
+  			'7xl': ['4.5rem', { lineHeight: '1.1' }],
+  			'8xl': ['6rem', { lineHeight: '1' }],
+  			'9xl': ['8rem', { lineHeight: '1' }]
+  		},
+  		letterSpacing: {
+  			tighter: '-0.05em',
+  			tight: '-0.025em',
+  			normal: '0em',
+  			wide: '0.025em',
+  			wider: '0.05em',
+  			widest: '0.1em'
   		}
   	}
   },

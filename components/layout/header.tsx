@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useTheme } from 'next-themes'
 import { useSession, signOut } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
+import { Logo } from '@/components/ui/logo'
 import { Menu, X, Sun, Moon, User, BookOpen, Trophy, Target, LogOut, Settings, ChevronDown, Brain } from 'lucide-react'
 
 const navigation = [
@@ -25,6 +26,35 @@ export function Header() {
 
   const handleSignOut = async () => {
     await signOut({ callbackUrl: '/' })
+  }
+
+  // Utility function to get professional display name
+  const getDisplayName = (fullName: string | null | undefined): string => {
+    if (!fullName) return 'User'
+    
+    // If name is longer than 12 characters, show first name + last initial
+    if (fullName.length > 12) {
+      const parts = fullName.trim().split(' ')
+      if (parts.length > 1) {
+        return `${parts[0]} ${parts[parts.length - 1].charAt(0)}.`
+      }
+      // If it's a single long word, truncate it
+      return `${fullName.substring(0, 10)}...`
+    }
+    
+    return fullName
+  }
+
+  // Utility function to get initials for avatar
+  const getInitials = (fullName: string | null | undefined): string => {
+    if (!fullName) return 'U'
+    
+    const parts = fullName.trim().split(' ')
+    if (parts.length === 1) {
+      return parts[0].charAt(0).toUpperCase()
+    }
+    
+    return `${parts[0].charAt(0)}${parts[parts.length - 1].charAt(0)}`.toUpperCase()
   }
 
   // Close dropdown when clicking outside
@@ -49,12 +79,7 @@ export function Header() {
           <div className="flex lg:flex-1">
             <Link href="/" className="-m-1.5 p-1.5">
               <span className="sr-only">PrepWithAI Himachal</span>
-              <div className="flex items-center space-x-2">
-                <BookOpen className="h-8 w-8 text-primary-500" />
-                <span className="text-xl font-bold gradient-text">
-                  PrepWithAI Himachal
-                </span>
-              </div>
+              <Logo size="md" textSize="lg" showText={true} />
             </Link>
           </div>
 
@@ -112,16 +137,18 @@ export function Header() {
                   onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
                   className="flex items-center space-x-3 rounded-lg px-3 py-2 hover:bg-gray-50 transition-colors"
                 >
-                  <div className="text-right">
-                    <p className="text-sm font-medium text-gray-900">{session.user?.name}</p>
+                  <div className="text-right min-w-0 flex-1">
+                    <p className="text-sm font-medium text-gray-900 truncate">
+                      {getDisplayName(session.user?.name)}
+                    </p>
                     <p className="text-xs text-gray-500 capitalize">{session.user?.role}</p>
                   </div>
-                  <div className="h-8 w-8 rounded-full bg-primary-600 flex items-center justify-center">
+                  <div className="h-8 w-8 rounded-full bg-primary-600 flex items-center justify-center flex-shrink-0">
                     <span className="text-white text-sm font-medium">
-                      {session.user?.name?.charAt(0).toUpperCase()}
+                      {getInitials(session.user?.name)}
                     </span>
                   </div>
-                  <ChevronDown className={`h-4 w-4 text-gray-500 transition-transform ${profileDropdownOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown className={`h-4 w-4 text-gray-500 transition-transform flex-shrink-0 ${profileDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 {/* Dropdown Menu */}
@@ -214,8 +241,7 @@ export function Header() {
               {/* Header */}
               <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 flex-shrink-0">
                 <Link href="/" className="flex items-center space-x-2" onClick={() => setMobileMenuOpen(false)}>
-                  <BookOpen className="h-6 w-6 sm:h-8 sm:w-8 text-primary-500" />
-                  <span className="text-base sm:text-lg font-bold">PrepWithAI</span>
+                  <Logo size="md" textSize="md" showText={true} />
                 </Link>
                 <button
                   type="button"
@@ -254,13 +280,15 @@ export function Header() {
                     {session ? (
                       <div className="space-y-4">
                         <div className="flex items-center px-3 py-2 bg-gray-50 rounded-lg">
-                          <div className="h-10 w-10 rounded-full bg-primary-600 flex items-center justify-center">
+                          <div className="h-10 w-10 rounded-full bg-primary-600 flex items-center justify-center flex-shrink-0">
                             <span className="text-white font-medium">
-                              {session.user?.name?.charAt(0).toUpperCase()}
+                              {getInitials(session.user?.name)}
                             </span>
                           </div>
-                          <div className="ml-3">
-                            <p className="text-base font-medium text-gray-900">{session.user?.name}</p>
+                          <div className="ml-3 min-w-0 flex-1">
+                            <p className="text-base font-medium text-gray-900 truncate">
+                              {session.user?.name}
+                            </p>
                             <p className="text-sm text-gray-500 capitalize">{session.user?.role}</p>
                           </div>
                         </div>

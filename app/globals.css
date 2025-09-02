@@ -1,3 +1,8 @@
+/* Import professional fonts from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -64,8 +69,13 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    @apply bg-background text-foreground font-body;
+    font-feature-settings: "rlig" 1, "calt" 1, "kern" 1;
+    font-variant-ligatures: common-ligatures;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-optical-sizing: auto;
   }
 }
 
@@ -89,6 +99,47 @@
   
   .btn-secondary {
     @apply bg-secondary-500 text-white hover:bg-secondary-600 transition-colors duration-200;
+  }
+
+  /* Typography Classes */
+  .text-display {
+    @apply font-display font-bold tracking-tight;
+  }
+  
+  .text-heading {
+    @apply font-heading font-semibold tracking-tight;
+  }
+  
+  .text-body {
+    @apply font-body leading-relaxed;
+  }
+  
+  .text-caption {
+    @apply font-body text-sm text-muted-foreground;
+  }
+  
+  .text-mono {
+    @apply font-mono text-sm;
+  }
+
+  /* Professional Button Styles */
+  .btn-professional {
+    @apply font-medium tracking-wide transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+
+  /* Professional Card Styles */
+  .card-professional {
+    @apply bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200;
+  }
+
+  /* Professional Form Styles */
+  .input-professional {
+    @apply font-body text-base leading-normal tracking-normal;
+  }
+
+  /* Professional Link Styles */
+  .link-professional {
+    @apply font-medium tracking-wide hover:tracking-wider transition-all duration-200;
   }
 }
 

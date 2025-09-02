@@ -25,6 +25,32 @@ export const metadata: Metadata = {
   authors: [{ name: 'PrepWithAI Himachal Team' }],
   creator: 'PrepWithAI Himachal',
   publisher: 'PrepWithAI Himachal',
+  icons: {
+    icon: [
+      {
+        url: '/favicon.svg',
+        type: 'image/svg+xml',
+      },
+      {
+        url: '/logo-192.png',
+        sizes: '192x192',
+        type: 'image/png',
+      },
+      {
+        url: '/logo-512.png',
+        sizes: '512x512',
+        type: 'image/png',
+      },
+    ],
+    apple: [
+      {
+        url: '/logo-192.png',
+        sizes: '192x192',
+        type: 'image/png',
+      },
+    ],
+    shortcut: '/favicon.svg',
+  },
   openGraph: {
     type: 'website',
     locale: 'en_IN',
@@ -32,13 +58,23 @@ export const metadata: Metadata = {
     siteName: 'PrepWithAI Himachal',
     title: 'PrepWithAI Himachal - AI-Powered Exam Preparation',
     description: 'Prepare for HPSSC, HPPSC, Police, and Banking exams with AI-powered practice tests.',
+    images: [
+      {
+        url: '/logo-512.png',
+        width: 512,
+        height: 512,
+        alt: 'PrepWithAI Himachal Logo',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'PrepWithAI Himachal',
     description: 'AI-Powered Exam Preparation for Himachal Pradesh',
+    images: ['/logo-512.png'],
   },
   robots: 'index, follow',
+  manifest: '/manifest.json',
 }
 
 export default function RootLayout({

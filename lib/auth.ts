@@ -2,6 +2,7 @@ import { NextAuthOptions, DefaultSession } from 'next-auth'
 import { JWT } from 'next-auth/jwt'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import GoogleProvider from 'next-auth/providers/google'
+import FacebookProvider from 'next-auth/providers/facebook'
 import { UserRole } from '@/types'
 
 // Extend the built-in session types
@@ -59,24 +60,6 @@ declare module 'next-auth/jwt' {
 
 // Mock API functions - Replace with actual FastAPI calls
 async function authenticateUser(email: string, password: string) {
-  // Development mock authentication
-  // if (process.env.NODE_ENV === 'development') {
-  //   // Accept any email/password for development
-  //   if (email && password) {
-  //     return {
-  //       id: '1',
-  //       email: email,
-  //       name: email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-  //       role: 'student' as UserRole,
-  //       avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(email.split('@')[0])}&background=3B82F6&color=fff`,
-  //       isEmailVerified: true,
-  //       isActive: true, // always present
-  //       accessToken: 'dev-mock-token',
-  //     }
-  //   }
-  //   return null
-  // }
-
   try {
     const params = new URLSearchParams();
     params.append('username', email);
@@ -108,6 +91,61 @@ async function authenticateUser(email: string, password: string) {
   } catch (error) {
     console.error('Authentication error:', error)
     return null
+  }
+}
+
+// Handle social login with backend
+async function handleSocialLogin(email: string, name: string, avatar?: string, provider?: string) {
+  try {
+    console.log('Attempting social login for:', email, 'with provider:', provider)
+    
+    // First check if user exists
+    const checkResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/social-login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email,
+        name,
+        avatar,
+        provider: provider || 'google',
+        is_verified: true, // Social logins are pre-verified
+      }),
+    })
+
+    if (checkResponse.ok) {
+      const data = await checkResponse.json()
+      console.log('Backend social login successful:', data)
+      
+      return {
+        id: data.user.id || email, // fallback to email if no ID
+        email: data.user.email || email,
+        name: data.user.name || name,
+        role: data.user.role || 'student',
+        avatar: data.user.avatar || avatar,
+        isEmailVerified: Boolean(data.user.is_verified ?? true),
+        isActive: Boolean(data.user.is_active ?? true),
+        accessToken: data.access_token || 'social-login-token',
+      }
+    } else {
+      console.warn('Backend social login failed, using fallback:', await checkResponse.text())
+    }
+  } catch (error) {
+    console.error('Social login error:', error)
+  }
+  
+  // Fallback - create user object for frontend use (always return a user for social login)
+  console.log('Using fallback user creation for social login')
+  return {
+    id: email,
+    email,
+    name,
+    role: 'student' as UserRole,
+    avatar: avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=3B82F6&color=fff`,
+    isEmailVerified: true,
+    isActive: true,
+    accessToken: 'fallback-social-token',
   }
 }
 
@@ -182,6 +220,58 @@ export const authOptions: NextAuthOptions = {
           scope: 'openid email profile',
         },
       },
+      profile: async (profile) => {
+        console.log('Google profile received:', profile)
+        
+        // Handle social login with backend - this now always returns a user
+        const user = await handleSocialLogin(
+          profile.email,
+          profile.name,
+          profile.picture,
+          'google'
+        )
+        
+        console.log('Social login result:', user)
+        
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          image: user.avatar,
+          role: user.role,
+          isEmailVerified: user.isEmailVerified,
+          isActive: user.isActive,
+          accessToken: user.accessToken,
+        }
+      },
+    }),
+    FacebookProvider({
+      clientId: process.env.FACEBOOK_CLIENT_ID!,
+      clientSecret: process.env.FACEBOOK_CLIENT_SECRET!,
+      profile: async (profile) => {
+        console.log('Facebook profile received:', profile)
+        
+        // Handle social login with backend - this now always returns a user
+        const user = await handleSocialLogin(
+          profile.email,
+          profile.name,
+          profile.picture?.data?.url,
+          'facebook'
+        )
+        
+        console.log('Facebook social login result:', user)
+        
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          image: user.avatar,
+          role: user.role,
+          isEmailVerified: user.isEmailVerified,
+          isActive: user.isActive,
+          accessToken: user.accessToken,
+        }
+      },
     }),
   ],
   session: {
@@ -199,9 +289,36 @@ export const authOptions: NextAuthOptions = {
     newUser: '/onboarding',
   },
   callbacks: {
+    async signIn({ user, account, profile, email, credentials }) {
+      console.log('SignIn callback triggered:', { 
+        user: user.email, 
+        provider: account?.provider,
+        type: account?.type 
+      })
+      
+      // Always allow social logins to proceed
+      if (account?.type === 'oauth') {
+        console.log('OAuth login approved for:', user.email)
+        return true
+      }
+      
+      // For credentials login, check if user exists and is verified
+      if (account?.type === 'credentials') {
+        return Boolean(user?.isEmailVerified && user?.isActive)
+      }
+      
+      return true
+    },
     async jwt({ token, user, account }) {
+      console.log('JWT callback triggered:', { 
+        hasUser: !!user, 
+        hasAccount: !!account,
+        provider: account?.provider 
+      })
+      
       // Initial sign in
       if (account && user) {
+        console.log('Setting up JWT for user:', user.email)
         return {
           ...token,
           id: user.id,
@@ -231,6 +348,8 @@ export const authOptions: NextAuthOptions = {
       return refreshAccessToken(token)
     },
     async session({ session, token }) {
+      console.log('Session callback triggered for:', token.sub)
+      
       if (token) {
         session.user.id = token.id
         session.user.role = token.role
@@ -241,10 +360,20 @@ export const authOptions: NextAuthOptions = {
       return session
     },
     async redirect({ url, baseUrl }) {
+      console.log('Redirect callback triggered:', { url, baseUrl })
+      
       // Allows relative callback URLs
-      if (url.startsWith('/')) return `${baseUrl}${url}`
+      if (url.startsWith('/')) {
+        console.log('Redirecting to relative URL:', `${baseUrl}${url}`)
+        return `${baseUrl}${url}`
+      }
       // Allows callback URLs on the same origin
-      else if (new URL(url).origin === baseUrl) return url
+      else if (new URL(url).origin === baseUrl) {
+        console.log('Redirecting to same origin URL:', url)
+        return url
+      }
+      
+      console.log('Redirecting to base URL:', baseUrl)
       return baseUrl
     },
   },

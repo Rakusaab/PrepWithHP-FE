@@ -33,7 +33,7 @@ export interface StudyLibraryStats {
 
 export const studyMaterialsApi = {
   getStats: async (): Promise<StudyLibraryStats> => {
-    return await fetcher('/study-library/stats')
+    return await fetcher('/api/v1/study-library/stats')
   },
 
   getMaterials: async (params?: {
@@ -57,24 +57,24 @@ export const studyMaterialsApi = {
       })
     }
 
-    const url = `/study-library/materials${searchParams.toString() ? `?${searchParams.toString()}` : ''}`
+    const url = `/api/v1/study-library/materials${searchParams.toString() ? `?${searchParams.toString()}` : ''}`
     return await fetcher(url)
   },
 
   getMaterialById: async (id: number): Promise<StudyMaterial> => {
-    return await fetcher(`/study-library/materials/${id}`)
+    return await fetcher(`/api/v1/study-library/materials/${id}`)
   },
 
   downloadMaterial: async (id: number): Promise<void> => {
-    return await fetcher(`/study-library/materials/${id}/download`, {
+    return await fetcher(`/api/v1/study-library/materials/${id}/download`, {
       method: 'POST'
     })
   },
 
   getPreviousPapers: async (exam_id?: number): Promise<StudyMaterial[]> => {
     const url = exam_id 
-      ? `/study-library/previous-papers?exam_id=${exam_id}`
-      : '/study-library/previous-papers'
+      ? `/api/v1/study-library/previous-papers?exam_id=${exam_id}`
+      : '/api/v1/study-library/previous-papers'
     return await fetcher(url)
   }
 }
