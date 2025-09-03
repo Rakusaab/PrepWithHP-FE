@@ -89,6 +89,11 @@ export const contentScrapingAPI = {
     return data;
   },
 
+  retryJob: async (jobId: number) => {
+    const { data } = await api.post(`/admin/content-scraping/jobs/${jobId}/retry`);
+    return data;
+  },
+
   getJobDetails: async (jobId: number) => {
     const { data } = await api.get(`/admin/content-scraping/jobs/${jobId}`);
     return data;
@@ -120,5 +125,63 @@ export const contentScrapingAPI = {
   // Search content (alias for getContent)
   searchContent: async (searchParams: any = {}) => {
     return contentScrapingAPI.getContent(searchParams);
+  },
+
+  // Content Sources Management
+  getContentSources: async () => {
+    const { data } = await api.get('/admin/content-sources/content-sources');
+    return data;
+  },
+
+  addContentSource: async (sourceData: any) => {
+    const { data } = await api.post('/admin/content-sources/add-content-source', sourceData);
+    return data;
+  },
+
+  deleteContentSource: async (sourceId: number) => {
+    const { data } = await api.delete(`/admin/content-sources/content-source/${sourceId}`);
+    return data;
+  },
+
+  startComprehensiveCrawling: async (sourceIds: number[]) => {
+    const { data } = await api.post('/admin/content-sources/start-comprehensive-crawling', {
+      source_ids: sourceIds,
+      max_depth: 3,
+      force_recrawl: false
+    });
+    return data;
+  },
+
+  getCrawlingStats: async () => {
+    const { data } = await api.get('/admin/content-reports/content-summary');
+    return data;
+  },
+
+  // Intelligent Scraping
+  getIntelligentScrapingJobs: async (status?: string) => {
+    const { data } = await api.get('/admin/intelligent-scraping/scraping-jobs', {
+      params: status ? { status } : {}
+    });
+    return data;
+  },
+
+  getIntelligentScrapingJobStatus: async (jobId: number) => {
+    const { data } = await api.get(`/admin/intelligent-scraping/scraping-job-status/${jobId}`);
+    return data;
+  },
+
+  startIntelligentScraping: async (request: any) => {
+    const { data } = await api.post('/admin/intelligent-scraping/start-intelligent-scraping', request);
+    return data;
+  },
+
+  retryScrapingJob: async (jobId: number) => {
+    const { data } = await api.post(`/admin/intelligent-scraping/retry-scraping-job/${jobId}`);
+    return data;
+  },
+
+  getActiveScrapingJobs: async () => {
+    const { data } = await api.get('/admin/intelligent-scraping/active-scraping-jobs');
+    return data;
   },
 };

@@ -124,24 +124,24 @@ export default function AdminDashboard() {
             <CardDescription>Frequently used administrative tasks</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Link href="/admin/content-generation">
+            <Link href="/admin/intelligent-scraping">
               <Button className="w-full justify-start" size="lg">
                 <Database className="mr-3 h-5 w-5" />
-                Generate Study Content
+                Intelligent Content Scraping
               </Button>
             </Link>
             
-            <Link href="/admin/materials">
+            <Link href="/admin/content-sources">
               <Button variant="outline" className="w-full justify-start" size="lg">
                 <FileText className="mr-3 h-5 w-5" />
-                Manage Study Materials
+                Content Sources Management
               </Button>
             </Link>
             
-            <Link href="/admin/tests">
+            <Link href="/admin/content-generation">
               <Button variant="outline" className="w-full justify-start" size="lg">
                 <TestTube className="mr-3 h-5 w-5" />
-                Manage Mock Tests
+                Generate Study Content
               </Button>
             </Link>
             

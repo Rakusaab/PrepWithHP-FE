@@ -165,6 +165,15 @@ export function Sidebar({ collapsed, onCollapsedChange, mobileMenuOpen = false, 
       isExternal: false
     },
     {
+      name: 'Content Sources',
+      href: '/admin/content-sources',
+      icon: Database,
+      description: 'Manage crawling sources',
+      isAdmin: true,
+      featured: true,
+      isExternal: false
+    },
+    {
       name: 'User Management',
       href: '/admin/users',
       icon: Users,
