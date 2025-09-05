@@ -184,4 +184,37 @@ export const contentScrapingAPI = {
     const { data } = await api.get('/admin/intelligent-scraping/active-scraping-jobs');
     return data;
   },
+
+  // Content Library - AI-powered content filtering
+  filterContent: async (filters: any = {}) => {
+    const { data } = await api.get('/content-library/filter', { params: filters });
+    return data;
+  },
+
+  processContentSample: async (limit: number = 10) => {
+    const { data } = await api.post(`/content-library/process-sample-content?limit=${limit}`);
+    return data;
+  },
+
+  getContentAnalysisStats: async () => {
+    const { data } = await api.get('/content-library/analysis-stats');
+    return data;
+  },
+
+  getContentCategories: async () => {
+    const { data } = await api.get('/content-library/categories');
+    return data;
+  },
+
+  getContentSubjects: async () => {
+    const { data } = await api.get('/content-library/subjects');
+    return data;
+  },
+
+  downloadContentFile: async (contentId: number) => {
+    const response = await api.get(`/content-library/download/${contentId}`, {
+      responseType: 'blob'
+    });
+    return response.data;
+  },
 };

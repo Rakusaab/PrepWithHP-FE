@@ -184,66 +184,6 @@ export default function AdvancedScrapingInterface() {
   const getJobReport = async (jobId: string) => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/v1/admin/advanced-scraping/enhanced-report/${jobId}`);
-      if (response.ok) {
-        const data = await response.json();
-        
-        const report: ScrapingReport = {
-          job_id: jobId,
-          job_name: `Job ${jobId}`,
-          total_sources: data.valuable_sources.length,
-          sources_processed: data.valuable_sources.length,
-          content_found: data.total_content,
-          high_quality_content: data.high_quality_content,
-          medium_quality_content: data.medium_quality_content,
-          low_quality_content: data.low_quality_content,
-          pdfs_found: data.pdfs_found,
-          documents_found: data.pdfs_found,
-          total_file_size: 0,
-          processing_time: '2 minutes',
-          success_rate: 100,
-          valuable_sources: data.valuable_sources,
-          failed_sources: [],
-          top_content: data.top_content.map((item: any) => ({
-            url: item.url,
-            title: item.title,
-            content_type: item.content_type,
-            file_size: 0,
-            category: item.category,
-            quality_score: item.quality_score,
-            file_path: null,
-            description: item.title
-          }))
-        };
-        
-        setCurrentReport(report);
-        setActiveTab('reports');
-        showMessage(`Found ${data.total_content} items, ${data.pdfs_found} PDFs`, 'success');
-      } else {
-        showMessage('No data found for this job yet', 'info');
-      }
-    } catch (error) {
-      showMessage(`Report error: ${error}`, 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadValuableSources = async () => {
-    try {
-      const response = await fetch('/api/v1/admin/advanced-scraping/valuable-sources?min_quality=50');
-      if (response.ok) {
-        const data = await response.json();
-        setValuableSources(data.sources || []);
-      }
-    } catch (error) {
-      console.error('Error loading sources:', error);
-    }
-  };
-
-  const getJobReport = async (jobId: string) => {
-    setLoading(true);
-    try {
       // Try to get logs from existing scraping system
       const response = await fetch(`/api/v1/admin/scraping/logs/${jobId}`);
       if (response.ok) {

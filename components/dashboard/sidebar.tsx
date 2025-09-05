@@ -174,6 +174,15 @@ export function Sidebar({ collapsed, onCollapsedChange, mobileMenuOpen = false, 
       isExternal: false
     },
     {
+      name: 'AI Content Library',
+      href: '/admin/content-library',
+      icon: Brain,
+      description: 'AI-powered content filtering',
+      isAdmin: true,
+      featured: true,
+      isExternal: false
+    },
+    {
       name: 'User Management',
       href: '/admin/users',
       icon: Users,

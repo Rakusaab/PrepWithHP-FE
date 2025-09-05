@@ -567,7 +567,7 @@ export default function MaterialsManagementPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Total Materials</p>
-                <p className="text-3xl font-bold text-gray-900">{stats.total_materials}</p>
+                <p className="text-3xl font-bold text-gray-900">{stats?.total_materials || 0}</p>
               </div>
               <FileText className="h-8 w-8 text-blue-600" />
             </div>
@@ -579,7 +579,7 @@ export default function MaterialsManagementPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Published</p>
-                <p className="text-3xl font-bold text-green-600">{stats.published_materials}</p>
+                <p className="text-3xl font-bold text-green-600">{stats?.published_materials || 0}</p>
               </div>
               <CheckCircle className="h-8 w-8 text-green-600" />
             </div>
@@ -591,7 +591,7 @@ export default function MaterialsManagementPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Drafts</p>
-                <p className="text-3xl font-bold text-yellow-600">{stats.draft_materials}</p>
+                <p className="text-3xl font-bold text-yellow-600">{stats?.draft_materials || 0}</p>
               </div>
               <Clock className="h-8 w-8 text-yellow-600" />
             </div>
@@ -603,7 +603,7 @@ export default function MaterialsManagementPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Total Views</p>
-                <p className="text-3xl font-bold text-blue-600">{stats.total_views.toLocaleString()}</p>
+                <p className="text-3xl font-bold text-blue-600">{stats?.total_views?.toLocaleString() || '0'}</p>
               </div>
               <Eye className="h-8 w-8 text-blue-600" />
             </div>
@@ -615,7 +615,7 @@ export default function MaterialsManagementPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Downloads</p>
-                <p className="text-3xl font-bold text-purple-600">{stats.total_downloads.toLocaleString()}</p>
+                <p className="text-3xl font-bold text-purple-600">{stats?.total_downloads?.toLocaleString() || '0'}</p>
               </div>
               <Download className="h-8 w-8 text-purple-600" />
             </div>
@@ -627,7 +627,7 @@ export default function MaterialsManagementPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Avg Rating</p>
-                <p className="text-3xl font-bold text-orange-600">{stats.avg_rating.toFixed(1)}</p>
+                <p className="text-3xl font-bold text-orange-600">{stats?.avg_rating?.toFixed(1) || '0.0'}</p>
               </div>
               <TrendingUp className="h-8 w-8 text-orange-600" />
             </div>

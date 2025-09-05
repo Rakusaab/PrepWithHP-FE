@@ -660,3 +660,41 @@ export interface AppError {
   details?: Record<string, unknown>
   timestamp: string
 }
+
+// Study Materials Types
+export interface StudyMaterial {
+  id: string
+  title: string
+  description?: string
+  material_type: string
+  difficulty_level?: string
+  language: string
+  year?: number
+  page_count?: number
+  estimated_read_time?: number
+  download_count: number
+  view_count: number
+  rating_average?: number
+  is_featured: boolean
+  is_premium: boolean
+  created_at: string
+  exam_name?: string
+  subject_name?: string
+  topic_name?: string
+}
+
+export interface StudyLibraryStats {
+  total_materials: number
+  total_previous_papers: number
+  total_mock_test_series: number
+  total_answer_keys: number
+  featured_materials: number
+  materials_by_exam: Array<{
+    exam_name: string
+    count: number
+  }>
+  materials_by_type: Array<{
+    material_type: string
+    count: number
+  }>
+}
